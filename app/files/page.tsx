@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { Input } from '@/components/ui/input';
-import { toast } from '@/components/ui/use-toast';
-import { Database } from '@/supabase/functions/_lib/database';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useQuery } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
+import { Database } from "@/supabase/functions/_lib/database";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export default function FilesPage() {
   const supabase = createClientComponentClient<Database>();
   const router = useRouter();
 
-  const { data: documents } = useQuery(['files'], async () => {
+  const { data: documents } = useQuery(["files"], async () => {
     const { data, error } = await supabase
-      .from('documents_with_storage_path')
+      .from("documents_with_storage_path")
       .select();
 
     if (error) {
       toast({
-        variant: 'destructive',
-        description: 'Failed to fetch documents',
+        variant: "destructive",
+        description: "Failed to fetch documents"
       });
       throw error;
     }
@@ -38,8 +38,13 @@ export default function FilesPage() {
             const selectedFile = e.target.files?.[0];
 
             if (selectedFile) {
+              console.log(
+                "${crypto.randomUUID()}/${selectedFile.name}:",
+                `${crypto.randomUUID()}/${selectedFile.name}`
+              );
+
               const { error } = await supabase.storage
-                .from('files')
+                .from("files")
                 .upload(
                   `${crypto.randomUUID()}/${selectedFile.name}`,
                   selectedFile
@@ -47,14 +52,14 @@ export default function FilesPage() {
 
               if (error) {
                 toast({
-                  variant: 'destructive',
+                  variant: "destructive",
                   description:
-                    'There was an error uploading the file. Please try again.',
+                    "There was an error uploading the file. Please try again."
                 });
                 return;
               }
 
-              router.push('/chat');
+              router.push("/chat");
             }
           }}
         />
@@ -67,20 +72,20 @@ export default function FilesPage() {
               onClick={async () => {
                 if (!document.storage_object_path) {
                   toast({
-                    variant: 'destructive',
-                    description: 'Failed to download file, please try again.',
+                    variant: "destructive",
+                    description: "Failed to download file, please try again."
                   });
                   return;
                 }
 
                 const { data, error } = await supabase.storage
-                  .from('files')
+                  .from("files")
                   .createSignedUrl(document.storage_object_path, 60);
 
                 if (error) {
                   toast({
-                    variant: 'destructive',
-                    description: 'Failed to download file. Please try again.',
+                    variant: "destructive",
+                    description: "Failed to download file. Please try again."
                   });
                   return;
                 }
